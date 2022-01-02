@@ -21,6 +21,10 @@ $ cargo build-bpf
 ```
 $ solana config set --url devnet
 ```
+### Request airdrop for test
+```
+$ solana airdrop 2
+```
 ### Deploy the program
 ```
 $ solana program deploy target/deploy/solana_oracle_example.so
@@ -33,7 +37,7 @@ $ ts-node client/main.ts
 Then, the result will be print, like following:
 ```
 Connection to cluster established: https://api.devnet.solana.com { 'feature-set': 2385070269, 'solana-core': '1.8.11' }
-Using account 2z6Du6hGQZvFXJ8HbtYc1JAfrn2ukHnQqdvCEShk1eg6 containing 601.019314762 SOL to pay for fees
+Using account 2z6Du6hGQZvFXJ8HbtYc1JAfrn2ukHnQqdvCEShk1eg6 containing 1.019314762 SOL to pay for fees
 Using program 7zU7sSudHNTrpcMNCCiXXb7te2eFAeS3j7AZ6xGQTxRF
 DAPE #1 [Gp6izRWvMT9abbN73qAMBXwBqUzWCmikLtwj4YxWLy8W] price is 0.1 SOL updated on  <Fri Sep 05 2251 23:48:08 GMT+0800 (China Standard Time)>
 ```
