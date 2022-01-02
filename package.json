@@ -1,0 +1,21 @@
+{
+  "name": "solana-oracle-example",
+  "version": "1.0.0",
+  "description": "1. Install Rust from https://rustup.rs/ 2. Install Solana from https://docs.solana.com/cli/install-solana-cli-tools#use-solanas-install-tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx ts-node client/main.ts",
+    "deploy": "cargo build-bpf && solana program deploy target/deploy/solana_oracle_example.so"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@solana/web3.js": "^1.31.0",
+    "@types/mocha": "^9.0.0",
+    "mz": "^2.7.0",
+    "ts-mocha": "^8.0.0",
+    "ts-node": "^10.4.0",
+    "yaml": "^1.10.2"
+  }
+}
