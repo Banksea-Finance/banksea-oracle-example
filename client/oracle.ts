@@ -54,12 +54,12 @@ import BN from 'bn.js';
   
   /**
    * Path to the keypair of the deployed program.
-   * This file is created when running `solana program deploy dist/program/helloworld.so`
+   * This file is created when running `solana program deploy ../target/deploy/solana_oracle_example.so`
    */
   const PROGRAM_KEYPAIR_PATH = path.join(PROGRAM_PATH, 'solana_oracle_example-keypair.json');
   
   /**
-   * The state of a answer account managed by the hello world program
+   * The state of a answer account managed by the program
    */
   class AnswerAccount {
     addr: PublicKey;
@@ -151,7 +151,7 @@ import BN from 'bn.js';
     } catch (err) {
       const errMsg = (err as Error).message;
       throw new Error(
-        `Failed to read program keypair at '${PROGRAM_KEYPAIR_PATH}' due to error: ${errMsg}. Program may need to be deployed with \`solana program deploy dist/program/helloworld.so\``,
+        `Failed to read program keypair at '${PROGRAM_KEYPAIR_PATH}' due to error: ${errMsg}. Program may need to be deployed with ${PROGRAM_SO_PATH}`,
       );
     }
   
@@ -160,7 +160,7 @@ import BN from 'bn.js';
     if (programInfo === null) {
       if (fs.existsSync(PROGRAM_SO_PATH)) {
         throw new Error(
-          'Program needs to be deployed with `solana program deploy dist/program/helloworld.so`',
+          `Program needs to be deployed with ${PROGRAM_SO_PATH}`,
         );
       } else {
         throw new Error('Program needs to be built and deployed');
@@ -171,7 +171,7 @@ import BN from 'bn.js';
     console.log(`Using program ${programId.toBase58()}`);
   
     // Derive the address (public key) of a answer account from the program so that it's easy to find later.
-    const ORALE_SEED = 'Banksea Oracle example';
+    const ORALE_SEED = 'Banksea Oracle Example';
     answerPubkey = await PublicKey.createWithSeed(
       payer.publicKey,
       ORALE_SEED,
@@ -222,7 +222,7 @@ import BN from 'bn.js';
     const instruction = new TransactionInstruction({
       keys: [feed, answer],
       programId,
-      data: Buffer.alloc(0), // All instructions are hellos
+      data: Buffer.alloc(0),
     });
 
     await sendAndConfirmTransaction(
@@ -233,7 +233,7 @@ import BN from 'bn.js';
   }
   
   /**
-   * Report the number of times the answer account has been said hello to
+   * Report the detail of answer account 
    */
   export async function reportAnswer(): Promise<void> {
     const accountInfo = await connection.getAccountInfo(answerPubkey);
