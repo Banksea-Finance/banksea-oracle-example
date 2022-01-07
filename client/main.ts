@@ -6,8 +6,8 @@ import {
   establishConnection,
   establishPayer,
   checkProgram,
-  callProgram,
-  reportAnswer,
+  getPriceOnEthereum,
+  getPriceOnSolana,
 } from './oracle';
 
 async function main() {
@@ -20,11 +20,11 @@ async function main() {
   // Check if the program has been deployed
   await checkProgram();
 
-  // Say hello to an account
-  await callProgram();
+  // A example for geting price on Ethereum
+  await getPriceOnEthereum();
 
-  // Find out how many times that account has been greeted
-  await reportAnswer();
+  // A example for geting price on Solana
+  await getPriceOnSolana();
 
   console.log('Success');
 }

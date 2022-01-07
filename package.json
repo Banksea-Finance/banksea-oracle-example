@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npx ts-node client/main.ts",
-    "deploy": "cargo build-bpf && solana program deploy target/deploy/solana_oracle_example.so"
+    "deploy": "cargo build-bpf && solana program deploy target/deploy/banksea_oracle_example.so"
   },
   "keywords": [],
   "author": "",

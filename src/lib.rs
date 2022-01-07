@@ -9,7 +9,8 @@ use solana_program::{
 
 #[derive(BorshSerialize, BorshDeserialize)]
 pub struct Answer {
-    pub addr: Pubkey,
+    pub program_addr: Pubkey,
+    pub token_addr: Pubkey,
     pub price: u64,
     pub decimal: u64,
     pub time: u64,
@@ -25,19 +26,20 @@ fn process_instruction(
 ) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
-    let feed_account = next_account_info(accounts_iter)?;
+    let report_account = next_account_info(accounts_iter)?;
     let answer_account = next_account_info(accounts_iter)?;
 
-    let feed_info = banksea_oracle::get_feed_info(feed_account)?;
+    let report_info = banksea_oracle::get_report_info(report_account)?;
     let mut answer_info: Answer = try_from_slice_unchecked(&answer_account.data.borrow())?;
 
-    answer_info.addr = feed_info.addr;
-    answer_info.price = feed_info.price;
-    answer_info.decimal = feed_info.decimal;
-    answer_info.time = feed_info.time;
-    answer_info.name = feed_info.name;
-    answer_info.price_type = feed_info.price_type;
-
+    answer_info.program_addr = report_info.program_addr;
+    answer_info.token_addr = report_info.token_addr;
+    answer_info.price = report_info.price;
+    answer_info.decimal = report_info.decimal;
+    answer_info.time = report_info.time;
+    answer_info.name = report_info.name;
+    answer_info.price_type = report_info.price_type;
+    
     answer_info.serialize(&mut &mut answer_account.data.borrow_mut()[..])?;
     Ok(())
 }

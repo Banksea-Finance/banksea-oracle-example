@@ -50,28 +50,30 @@ const PROGRAM_PATH = path.resolve(__dirname, '../target/deploy');
  *   - `npm run build:program-c`
  *   - `npm run build:program-rust`
  */
-const PROGRAM_SO_PATH = path.join(PROGRAM_PATH, 'solana_oracle_example.so');
+const PROGRAM_SO_PATH = path.join(PROGRAM_PATH, 'banksea_oracle_example.so');
 
 /**
  * Path to the keypair of the deployed program.
- * This file is created when running `solana program deploy ../target/deploy/solana_oracle_example.so`
+ * This file is created when running `solana program deploy ../target/deploy/banksea_oracle_example.so`
  */
-const PROGRAM_KEYPAIR_PATH = path.join(PROGRAM_PATH, 'solana_oracle_example-keypair.json');
+const PROGRAM_KEYPAIR_PATH = path.join(PROGRAM_PATH, 'banksea_oracle_example-keypair.json');
 
 /**
  * The state of a answer account managed by the program
  */
 class AnswerAccount {
-  addr: PublicKey;
+  programAddr: PublicKey;
+  tokenAddr: PublicKey;
   price: number;
   time: number;
   decimal: number;
   name: string;
   priceType: string;
 
-  constructor(fields: {addr: Uint8Array, price: number, time: number, decimal: number, name: string, priceType: string }) {
+  constructor(fields: {programAddr: Uint8Array, tokenAddr: Uint8Array, price: number, time: number, decimal: number, name: string, priceType: string }) {
     if (fields) {
-      this.addr = new PublicKey(fields.addr);
+      this.programAddr = new PublicKey(fields.programAddr);
+      this.tokenAddr = new PublicKey(fields.tokenAddr);
       this.price = fields.price;
       this.decimal = fields.decimal;
       this.time = fields.time;
@@ -85,13 +87,13 @@ class AnswerAccount {
  * Borsh schema definition for answer accounts
  */
 const AnswerSchema = new Map([
-  [AnswerAccount, {kind: 'struct', fields: [['addr', [32]], ['price', 'u64'], ['decimal', 'u64'], ['time', 'u64'], ['name', 'string'], ['priceType', 'string']]}],
+  [AnswerAccount, {kind: 'struct', fields: [['programAddr', [32]], ['tokenAddr', [32]], ['price', 'u64'], ['decimal', 'u64'], ['time', 'u64'], ['name', 'string'], ['priceType', 'string']]}],
 ]);
 
 /**
  * The expected size of each answer account.
  */
-const ANSWER_SIZE = 3 * 8 + 32 + 100 * 2;/*borsh.serialize(AnswerSchema, new AnswerAccount()).length;*/
+const ANSWER_SIZE = 3 * 8 + 2 * 32 + 100 * 2;/*borsh.serialize(AnswerSchema, new AnswerAccount()).length;*/
 
 /**
  * Establish a connection to the cluster
@@ -171,7 +173,7 @@ export async function checkProgram(): Promise<void> {
   console.log(`Using program ${programId.toBase58()}`);
 
   // Derive the address (public key) of a answer account from the program so that it's easy to find later.
-  const ORALE_SEED = 'Banksea Oracle Example';
+  const ORALE_SEED = 'Banksea-Oracle-Example';
   answerPubkey = await PublicKey.createWithSeed(
     payer.publicKey,
     ORALE_SEED,
@@ -184,7 +186,7 @@ export async function checkProgram(): Promise<void> {
     console.log(
       'Creating answer account',
       answerPubkey.toBase58(),
-      'to get value from feed account',
+      'to get value from report account',
     );
     const lamports = await connection.getMinimumBalanceForRentExemption(
       ANSWER_SIZE,
@@ -206,9 +208,50 @@ export async function checkProgram(): Promise<void> {
 }
 
 
-export async function callProgram(): Promise<void> {
-  let feed = {    
-    pubkey: new PublicKey('7bZdZK1zqXTb1pCGp7oQ9dXW14SZmBgzpa9ooARbi4Hb'),
+/**
+ * @name: getReportIdFromETH
+ * @description: use to get reportId
+ * @param contractAddr: contract address on Ethereum 
+ * @param tokenAddr: token id in a contract like `ERC721` on Ethereum 
+ * @returns oracle report account publickey
+ */
+async function getReportIdFromETH(contractAddr: string, tokenId: string) : Promise<PublicKey> {
+  const oracleProgramId = new PublicKey("2PFQyvuoNw7RbWDf3M9oGTLr9ne98pimvsU2eVPxwuBa");
+
+  const _programId = new PublicKey(new BN(contractAddr, 16));
+  const _tokenId = new PublicKey(new BN(tokenId, 10));
+  const [reportId, ] = await PublicKey.findProgramAddress(
+    [_programId.toBuffer(), _tokenId.toBuffer()],
+    oracleProgramId,  
+  );
+  return reportId;
+}
+
+/**
+ * @name: getReportIdFromSOL
+ * @description: use to get reportId
+ * @param tokenMint: nft token mint on Solana
+ * @returns oracle report account publickey
+ */
+async function getReportIdFromSOL(tokenMint: string) : Promise<PublicKey> {
+  const oracleProgramId = new PublicKey("2PFQyvuoNw7RbWDf3M9oGTLr9ne98pimvsU2eVPxwuBa");
+  const _programId = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+  const _tokenId = new PublicKey(tokenMint);
+  const [reportId, ] = await PublicKey.findProgramAddress(
+    [_programId.toBuffer(), _tokenId.toBuffer()],
+    oracleProgramId,  
+  );
+  return reportId;
+}
+
+
+
+export async function getPriceOnEthereum(): Promise<void> {
+  const reportId = await getReportIdFromETH("b47e3cd837ddf8e4c57f05d70ab865de6e193bbb", "1234"); // It is `CryptoPunk #1234` 
+  console.log(reportId.toString());
+
+  let report = {    
+    pubkey: reportId,
     isSigner: false,
     isWritable: false,
   };
@@ -220,7 +263,7 @@ export async function callProgram(): Promise<void> {
   };
 
   const instruction = new TransactionInstruction({
-    keys: [feed, answer],
+    keys: [report, answer],
     programId,
     data: Buffer.alloc(0),
   });
@@ -230,12 +273,9 @@ export async function callProgram(): Promise<void> {
     new Transaction().add(instruction),
     [payer],
   );
-}
 
-/**
- * print the detail of answer account 
- */
-export async function reportAnswer(): Promise<void> {
+
+  // print the detail of answer account 
   const accountInfo = await connection.getAccountInfo(answerPubkey);
   if (accountInfo === null) {
     throw 'Error: cannot find the account';
@@ -249,7 +289,59 @@ export async function reportAnswer(): Promise<void> {
 
   console.log(
     answerInfo.name,
-    `[${answerInfo.addr}]`,
+    `[${answerInfo.programAddr} : ${answerInfo.tokenAddr}]`,
+    'price is',
+    answerInfo.price / (10**answerInfo.decimal),
+    answerInfo.priceType,
+    'updated on ',
+    `<${new Date (answerInfo.time * 1000).toString()}>`,
+  );
+}
+
+export async function getPriceOnSolana(): Promise<void> {
+  const reportId = await getReportIdFromSOL("HeVXJCURxNSjkXESJvnofvmxZ3bAziepJWLk5EfqEt3y"); // It is `Degen Ape #6117` 
+  console.log(reportId.toString());
+
+  let report = {    
+    pubkey: reportId,
+    isSigner: false,
+    isWritable: false,
+  };
+
+  let answer = {
+    pubkey: answerPubkey, 
+    isSigner: false, 
+    isWritable: true 
+  };
+
+  const instruction = new TransactionInstruction({
+    keys: [report, answer],
+    programId,
+    data: Buffer.alloc(0),
+  });
+
+  await sendAndConfirmTransaction(
+    connection,
+    new Transaction().add(instruction),
+    [payer],
+  );
+
+
+  // print the detail of answer account 
+  const accountInfo = await connection.getAccountInfo(answerPubkey);
+  if (accountInfo === null) {
+    throw 'Error: cannot find the account';
+  }
+
+  const answerInfo = borsh.deserializeUnchecked(
+    AnswerSchema,
+    AnswerAccount,
+    Buffer.from(accountInfo.data),
+  );
+
+  console.log(
+    answerInfo.name,
+    `[${answerInfo.programAddr} : ${answerInfo.tokenAddr}]`,
     'price is',
     answerInfo.price / (10**answerInfo.decimal),
     answerInfo.priceType,
