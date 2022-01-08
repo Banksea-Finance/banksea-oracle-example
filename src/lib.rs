@@ -9,11 +9,13 @@ use solana_program::{
 
 #[derive(BorshSerialize, BorshDeserialize)]
 pub struct Answer {
+    pub source_chain: u32,
+    pub price: u64,
+    pub time: u64,
+    pub decimal: u64,
     pub program_addr: Pubkey,
     pub token_addr: Pubkey,
-    pub price: u64,
-    pub decimal: u64,
-    pub time: u64,
+    pub local_addr: Pubkey, // It is solana local mint address of the nft which is transfer from other chain
     pub name: String,
     pub price_type: String,
 }
@@ -31,9 +33,10 @@ fn process_instruction(
 
     let report_info = banksea_oracle::get_report_info(report_account)?;
     let mut answer_info: Answer = try_from_slice_unchecked(&answer_account.data.borrow())?;
-
+    answer_info.source_chain = report_info.source_chain;
     answer_info.program_addr = report_info.program_addr;
     answer_info.token_addr = report_info.token_addr;
+    answer_info.local_addr = report_info.local_addr;
     answer_info.price = report_info.price;
     answer_info.decimal = report_info.decimal;
     answer_info.time = report_info.time;

@@ -25,8 +25,6 @@ async function main() {
 
   // A example for geting price on Solana
   await getPriceOnSolana();
-
-  console.log('Success');
 }
 
 main().then(
