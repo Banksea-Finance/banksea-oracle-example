@@ -61,7 +61,7 @@ const PROGRAM_KEYPAIR_PATH = path.join(PROGRAM_PATH, 'banksea_oracle_example-key
 /**
  * The oralce program id on devnet
  */
-const ORACLE_PROGRAM_ID = new PublicKey("Bft3LCMttxnbKqfXq88xtezVyvDFK3kvD9N1ZXf2TNep");
+const ORACLE_PROGRAM_ID = new PublicKey("BorcZEiGQJAL62M9QotWAvZYGkymuVnf42mj5HYnLZQj");
 
 /**
  * Chain ID defined by oracle
