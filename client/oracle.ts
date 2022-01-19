@@ -163,6 +163,19 @@ class AnswerAccount {
       this.priceType = fields.priceType;
     }
   }
+
+  print() {
+    console.log(
+      'Answer Information:',
+      `\n\t${this.name}`,
+      `\n\tsource chain = ${chainName(this.sourceChain)}`,
+      `\n\tprogram addr = ${this.programAddr}`,
+      `\n\ttoken addr = ${this.tokenAddr}`,
+      `\n\tlocal addr = ${this.localAddr}`,
+      '\n\tprice is', this.price / (10 ** this.decimal), this.priceType,
+      '\n\tupdated on', `'${new Date(this.time * 1000).toString()}'`,
+    );
+  }
 }
 
 /**
@@ -280,8 +293,6 @@ export async function checkProgram(): Promise<void> {
 }
 
 
-
-
 export async function getPriceOnEthereum(): Promise<void> {
   const reportId = await getReportIdFromETH("b47e3cd837ddf8e4c57f05d70ab865de6e193bbb", "1234"); // It is `CryptoPunk #1234` 
 
@@ -322,16 +333,7 @@ export async function getPriceOnEthereum(): Promise<void> {
     Buffer.from(accountInfo.data),
   );
 
-  console.log(
-    'Answer Information:',
-    `\n\t${answerInfo.name}`,
-    `\n\tsource chain = ${chainName(answerInfo.sourceChain)}`,
-    `\n\tprogram addr = ${answerInfo.programAddr}`,
-    `\n\ttoken addr = ${answerInfo.tokenAddr}`,
-    `\n\tlocal addr = ${answerInfo.localAddr}`,
-    '\n\tprice is', answerInfo.price / (10 ** answerInfo.decimal), answerInfo.priceType,
-    '\n\tupdated on', `'${new Date(answerInfo.time * 1000).toString()}'`,
-  );
+  answerInfo.print();
 }
 
 export async function getPriceOnSolana(): Promise<void> {
@@ -374,14 +376,5 @@ export async function getPriceOnSolana(): Promise<void> {
     Buffer.from(accountInfo.data),
   );
 
-  console.log(
-    'Answer Information:',
-    `\n\t${answerInfo.name}`,
-    `\n\tsource chain = ${chainName(answerInfo.sourceChain)}`,
-    `\n\tprogram addr = ${answerInfo.programAddr}`,
-    `\n\ttoken addr = ${answerInfo.tokenAddr}`,
-    `\n\tlocal addr = ${answerInfo.localAddr}`,
-    '\n\tprice is', answerInfo.price / (10 ** answerInfo.decimal), answerInfo.priceType,
-    '\n\tupdated on', `'${new Date(answerInfo.time * 1000).toString()}'`,
-  );
+  answerInfo.print();
 }
