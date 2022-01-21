@@ -169,11 +169,8 @@ class AnswerAccount {
       'Answer Information:',
       `\n\t${this.name}`,
       `\n\tsource chain = ${chainName(this.sourceChain)}`,
-      `\n\tprogram addr = ${this.programAddr}`,
-      `\n\ttoken addr = ${this.tokenAddr}`,
-      `\n\tlocal addr = ${this.localAddr}`,
       '\n\tprice is', this.price / (10 ** this.decimal), this.priceType,
-      '\n\tupdated on', `'${new Date(this.time * 1000).toString()}'`,
+      '\n\tupdated on', `'${new Date(this.time * 1000).toUTCString()}'`,
     );
   }
 }
