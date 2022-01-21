@@ -1,7 +1,3 @@
-/**
- * Hello world
- */
-
 import {
   establishConnection,
   establishPayer,
