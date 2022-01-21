@@ -47,8 +47,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
-name = "banksea-oracle"
+name = "banksea-oracle-client"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "371001e23ee43607be21a6e5e75de9cb32182de81ccb7ea351e658c27114613d"
 dependencies = [
  "borsh",
  "borsh-derive",
@@ -59,7 +61,7 @@ dependencies = [
 name = "banksea-oracle-example"
 version = "0.1.0"
 dependencies = [
- "banksea-oracle",
+ "banksea-oracle-client",
  "borsh",
  "borsh-derive",
  "solana-program",
