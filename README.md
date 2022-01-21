@@ -1,43 +1,73 @@
 # Banksea Oracle Example
-This repo is an example guiding you to  use the banksea oracle in your program
-### Environment Setup
-* Install Rust from https://rustup.rs/
+This repo is an example guiding you to use the banksea oracle in your program
 
-* Install Solana from https://docs.solana.com/cli/install-solana-cli-tools#use-solanas-install-tool
+## Environment Setup
 
-### Clone this repo
-```
+Development requires rust and solana environment:
+
+* Install [Rust](https://rustup.rs/)
+
+* Install [Solana](https://docs.solana.com/cli/install-solana-cli-tools#use-solanas-install-tool)
+
+## Clone the example
+
+Clone the example about Banksea Oracle:
+
+```shell
 $ git clone https://github.com/Banksea-Finance/banksea-oracle-example.git
 ```
+
+## Run the example
+
+This section will guide you how to run the Banksea Oracle example.
+
 ### Install the dependencies
-```
+
+``` shell
 $ npm install
 ```
+
 ### Build the program
-```
+
+```shell
 $ cargo build-bpf
 ```
-### Set solana cluster to devnet
-```
+
+### Set Solana cluster to Devnet
+
+```shell
 $ solana config set --url devnet
 ```
+
 ### Request airdrop for test
-```
+
+``` shell
 $ solana airdrop 2
 ```
-### Deploy the program
-```
+
+###  Deploy the program
+
+``` shell 
 $ solana program deploy target/deploy/solana_oracle_example.so
 ```
-### Run the client to test example
+
+### Run the test client
+
 Run the following command to test the example program:
-```
+```shell
 $ ts-node client/main.ts
 ```
 Then, the result will be print, like following:
-```
-Connection to cluster established: https://api.devnet.solana.com { 'feature-set': 2385070269, 'solana-core': '1.8.11' }
-Using account 2z6Du6hGQZvFXJ8HbtYc1JAfrn2ukHnQqdvCEShk1eg6 containing 1.019314762 SOL to pay for fees
-Using program 7zU7sSudHNTrpcMNCCiXXb7te2eFAeS3j7AZ6xGQTxRF
-DAPE #1 [Gp6izRWvMT9abbN73qAMBXwBqUzWCmikLtwj4YxWLy8W] price is 0.1 SOL updated on  <Fri Sep 05 2251 23:48:08 GMT+0800 (China Standard Time)>
+```shell
+Connection to cluster established: https://api.devnet.solana.com { 'feature-set': 1006352700, 'solana-core': '1.8.12' }
+Answer Information: 
+        CryptoPunk #1234 
+        source chain = Ethererum 
+        price is 66.914393 ETH 
+        updated on 'Fri, 21 Jan 2022 07:23:48 GMT'
+Answer Information: 
+        Degen Ape #6117 
+        source chain = Solana 
+        price is 15.319274 SOL 
+        updated on 'Fri, 21 Jan 2022 07:39:17 GMT'
 ```
