@@ -16,10 +16,10 @@ async function main() {
   // Check if the program has been deployed
   await checkProgram();
 
-  // A example for geting price on Ethereum
+  // A example for getting price on Ethereum
   await getPriceOnEthereum();
 
-  // A example for geting price on Solana
+  // A example for getting price on Solana
   await getPriceOnSolana();
 }
 

@@ -44,11 +44,15 @@ $ solana config set --url devnet
 ``` shell
 $ solana airdrop 2
 ```
+Note: if this is your first time running solana devnet, you will need a new solana devnet wallet address:
+``` shell
+$ solana-keygen new -o <directory>
+```
 
 ###  Deploy the program
 
 ``` shell 
-$ solana program deploy target/deploy/solana_oracle_example.so
+$ solana program deploy target/deploy/banksea_oracle_example.so
 ```
 
 ### Run the test client
