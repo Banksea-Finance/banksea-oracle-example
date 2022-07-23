@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import {
   Keypair,
   Connection,
@@ -35,9 +32,15 @@ let payer: Keypair;
 let programId: PublicKey;
 
 /**
+ * The keypair of the answer account 
+ */
+
+const answerKeypair = Keypair.generate();
+
+/**
  * The public key of the answer account 
  */
-let answerPubkey: PublicKey;
+const answerPubkey = answerKeypair.publicKey;
 
 /**
  * Path to program files
@@ -58,137 +61,56 @@ const PROGRAM_SO_PATH = path.join(PROGRAM_PATH, 'banksea_oracle_example.so');
  */
 const PROGRAM_KEYPAIR_PATH = path.join(PROGRAM_PATH, 'banksea_oracle_example-keypair.json');
 
-/**
- * The oralce program id on devnet
- */
-const ORACLE_PROGRAM_ID = new PublicKey("BorcZEiGQJAL62M9QotWAvZYGkymuVnf42mj5HYnLZQj");
 
-/**
- * Chain ID defined by oracle
- */
-enum ChainId {
-  Solana = 0,
-  Ethererum,
-}
-/**
- * @name: encodeChainId
- * @description: encode chain id to Uint8Array
- * @param id: chain id (0: Solana; 1: Ethererum) 
- * @returns uint8 array
- */
-function encodeChainId(id: number): Uint8Array {
-  const encoder =
-    typeof TextEncoder === "undefined"
-      ? new (require("util").TextEncoder)("utf-8") // Node.
-      : new TextEncoder(); // Browser.
-  return encoder.encode(id.toString());
-}
-
-/**
- * @name: chainName
- * @description: get chain name by id
- * @param id: chain id (0: Solana; 1: Ethererum) 
- * @returns chain name
- */
-function chainName(id: number): string {
-  let name: string;
-  switch (id) {
-    case 0: { name = "Solana"; break; }
-    case 1: { name = "Ethererum"; break; }
-    default: { name = "DEFAULT"; break; }
-  }
-  return name;
-}
-
-/**
- * @name: getReportIdFromETH
- * @description: use to get reportId
- * @param contractAddr: contract address on Ethereum 
- * @param tokenAddr: token id in a contract like `ERC721` on Ethereum 
- * @returns oracle report account publickey
- */
-async function getReportIdFromETH(contractAddr: string, tokenId: string): Promise<PublicKey> {
-  const sourceChainId = 1;
-
-  const _programId = new PublicKey(new BN(contractAddr, 16));
-  const _tokenId = new PublicKey(new BN(tokenId, 10));
-  const [reportId,] = await PublicKey.findProgramAddress(
-    [encodeChainId(sourceChainId), _programId.toBuffer(), _tokenId.toBuffer()],
-    ORACLE_PROGRAM_ID,
-  );
-  return reportId;
-}
-
-/**
- * @name: getReportIdFromSOL
- * @description: use to get reportId
- * @param tokenMint: nft token mint on Solana
- * @returns oracle report account publickey
- */
-async function getReportIdFromSOL(tokenMint: string): Promise<PublicKey> {
-  const sourceChainId = 0;
-  const _programId = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
-  const _tokenId = new PublicKey(tokenMint);
-  const [reportId,] = await PublicKey.findProgramAddress(
-    [encodeChainId(sourceChainId), _programId.toBuffer(), _tokenId.toBuffer()],
-    ORACLE_PROGRAM_ID,
-  );
-  return reportId;
-}
 
 /**
  * The state of a answer account managed by the program
  */
 class AnswerAccount {
-  sourceChain: number;
-  price: number;
-  time: number;
-  decimal: number;
-  programAddr: PublicKey;
-  tokenAddr: PublicKey;
-  localAddr: PublicKey;
-  name: string;
-  priceType: string;
+  code: string;
+  unit: string;
+  floorPrice: number;
+  AIFloorPrice: number;
+  avgPrice: number;
+  decimals: number;
+  aggregateTime: number;
 
-  constructor(fields: { sourceChain: number, price: number, time: number, decimal: number, programAddr: Uint8Array, tokenAddr: Uint8Array, localAddr: Uint8Array, name: string, priceType: string }) {
+  constructor(fields: { code: string, unit: string, decimals: number, aggregateTime: number, floorPrice: number, AIFloorPrice: number, avgPrice: number}) {
     if (fields) {
-      this.sourceChain = fields.sourceChain;
-      this.price = fields.price;
-      this.time = fields.time;
-      this.decimal = fields.decimal;
-      this.programAddr = new PublicKey(fields.programAddr);
-      this.tokenAddr = new PublicKey(fields.tokenAddr);
-      this.localAddr = new PublicKey(fields.localAddr);
-      this.name = fields.name;
-      this.priceType = fields.priceType;
+      this.code = fields.code;
+      this.floorPrice = fields.floorPrice;
+      this.AIFloorPrice = fields.AIFloorPrice;
+      this.avgPrice = fields.avgPrice;
+      this.unit = fields.unit;
+      this.decimals = fields.decimals;
+      this.aggregateTime = fields.aggregateTime;
     }
   }
 
   print() {
     console.log(
       'Answer Information:',
-      `\n\t${this.name}`,
-      `\n\tsource chain = ${chainName(this.sourceChain)}`,
-      '\n\tprice is', this.price / (10 ** this.decimal), this.priceType,
-      '\n\tupdated on', `'${new Date(this.time * 1000).toUTCString()}'`,
+      `\n\t${this.code}`,
+      '\n\tfloor price is', this.floorPrice / (10 ** this.decimals), this.unit,
+      '\n\tAI floor price is', this.AIFloorPrice / (10 ** this.decimals), this.unit,
+      '\n\tavg price is', this.avgPrice / (10 ** this.decimals), this.unit,
+      '\n\tupdated on', `'${new Date(this.aggregateTime * 1000).toUTCString()}'`,
     );
   }
 }
 
 /**
- * Borsh schema definition for answer accounts
+ * Borsh schema definition for answer account
  */
 
-
-
 const AnswerSchema = new Map([
-  [AnswerAccount, { kind: 'struct', fields: [['sourceChain', 'u32'], ['price', 'u64'], ['time', 'u64'], ['decimal', 'u64'], ['programAddr', [32]], ['tokenAddr', [32]], ['localAddr', [32]], ['name', 'string'], ['priceType', 'string']] }],
+  [AnswerAccount, { kind: 'struct', fields: [['code', 'string'], ['unit', 'string'], ['decimals', 'u64'], ['aggregateTime', 'u64'], ['floorPrice', 'u64'], ['AIFloorPrice', 'u64'],  ['avgPrice', 'u64'], ] }],
 ]);
 
 /**
- * The expected size of each answer account.
+ * The expected size of each answer account
  */
-const ANSWER_SIZE = 3 * 8 + 2 * 32 + 100 * 2;/*borsh.serialize(AnswerSchema, new AnswerAccount()).length;*/
+const ANSWER_SIZE = 4 + 128  + 4 + 128 + 8 + 8 + 8 + 8 + 8;/*borsh.serialize(AnswerSchema, new AnswerAccount()).length;*/
 
 /**
  * Establish a connection to the cluster
@@ -197,7 +119,6 @@ export async function establishConnection(): Promise<void> {
   const rpcUrl = await getRpcUrl();
   connection = new Connection(rpcUrl, 'confirmed');
   const version = await connection.getVersion();
-  console.log('Connection to cluster established:', rpcUrl, version);
 }
 
 /**
@@ -259,42 +180,30 @@ export async function checkProgram(): Promise<void> {
     throw new Error(`Program is not executable`);
   }
 
-  // Derive the address (public key) of a answer account from the program so that it's easy to find later.
-  const ORALE_SEED = 'Banksea-Oracle-Example';
-  answerPubkey = await PublicKey.createWithSeed(
-    payer.publicKey,
-    ORALE_SEED,
-    programId,
+
+
+  const lamports = await connection.getMinimumBalanceForRentExemption(
+    ANSWER_SIZE,
   );
-
-  // Check if the answer account has already been created
-  const answerAccount = await connection.getAccountInfo(answerPubkey);
-  if (answerAccount === null) {
-    const lamports = await connection.getMinimumBalanceForRentExemption(
-      ANSWER_SIZE,
-    );
-
-    const transaction = new Transaction().add(
-      SystemProgram.createAccountWithSeed({
-        fromPubkey: payer.publicKey,
-        basePubkey: payer.publicKey,
-        seed: ORALE_SEED,
-        newAccountPubkey: answerPubkey,
-        lamports,
-        space: ANSWER_SIZE,
-        programId,
-      }),
-    );
-    await sendAndConfirmTransaction(connection, transaction, [payer]);
-  }
+  
+  const transaction = new Transaction().add(
+    SystemProgram.createAccount({
+      fromPubkey: payer.publicKey,
+      newAccountPubkey: answerPubkey,
+      lamports,
+      space: ANSWER_SIZE,
+      programId,
+    }),
+  );
+  await sendAndConfirmTransaction(connection, transaction, [payer, answerKeypair]);
 }
 
+// A example for getting oracle data
+export async function getOracleInfo(): Promise<void> {
+  const feedAccountId = new PublicKey("6n3X9PStr3EPKvYfqkaz3ezS3A3rxHdUY8kRyfsnurfU") // It is `degods` 
 
-export async function getPriceOnEthereum(): Promise<void> {
-  const reportId = await getReportIdFromETH("b47e3cd837ddf8e4c57f05d70ab865de6e193bbb", "1234"); // It is `CryptoPunk #1234` 
-
-  let report = {
-    pubkey: reportId,
+  let feedAccount = {
+    pubkey: feedAccountId,
     isSigner: false,
     isWritable: false,
   };
@@ -306,50 +215,7 @@ export async function getPriceOnEthereum(): Promise<void> {
   };
 
   const instruction = new TransactionInstruction({
-    keys: [report, answer],
-    programId,
-    data: Buffer.alloc(0),
-  });
-
-  await sendAndConfirmTransaction(
-    connection,
-    new Transaction().add(instruction),
-    [payer],
-  );
-
-
-  // print the detail of answer account 
-  const accountInfo = await connection.getAccountInfo(answerPubkey);
-  if (accountInfo === null) {
-    throw 'Error: cannot find the account';
-  }
-
-  const answerInfo = borsh.deserializeUnchecked(
-    AnswerSchema,
-    AnswerAccount,
-    Buffer.from(accountInfo.data),
-  );
-
-  answerInfo.print();
-}
-
-export async function getPriceOnSolana(): Promise<void> {
-  const reportId = await getReportIdFromSOL("HeVXJCURxNSjkXESJvnofvmxZ3bAziepJWLk5EfqEt3y"); // It is `Degen Ape #6117` 
-
-  let report = {
-    pubkey: reportId,
-    isSigner: false,
-    isWritable: false,
-  };
-
-  let answer = {
-    pubkey: answerPubkey,
-    isSigner: false,
-    isWritable: true
-  };
-
-  const instruction = new TransactionInstruction({
-    keys: [report, answer],
+    keys: [feedAccount, answer],
     programId,
     data: Buffer.alloc(0),
   });

@@ -1,13 +1,13 @@
 [package]
 name = "banksea-oracle-example"
-version = "0.1.0"
+version = "0.3.0"
 edition = "2018"
 
 [dependencies]
-borsh = "0.9.1"
-borsh-derive = "0.9.1"
-solana-program = "=1.8.1"
-banksea-oracle-client = "=0.1.0"
+borsh = "0.9.3"
+borsh-derive = "0.9.3"
+solana-program = "=1.10.29"
+banksea-oracle-client = "0.3.0"
 
 [lib]
 crate-type = ["cdylib", "lib"]

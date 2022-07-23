@@ -2,8 +2,7 @@ import {
   establishConnection,
   establishPayer,
   checkProgram,
-  getPriceOnEthereum,
-  getPriceOnSolana,
+  getOracleInfo,
 } from './oracle';
 
 async function main() {
@@ -16,11 +15,8 @@ async function main() {
   // Check if the program has been deployed
   await checkProgram();
 
-  // A example for getting price on Ethereum
-  await getPriceOnEthereum();
-
-  // A example for getting price on Solana
-  await getPriceOnSolana();
+  // A example for getting oracle data
+  await getOracleInfo();
 }
 
 main().then(

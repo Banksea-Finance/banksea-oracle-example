@@ -1,5 +1,5 @@
 # Banksea Oracle Example
-This repo is an example guiding you to use the banksea oracle in your program
+This repo is an example guiding you to use the banksea oracle in your program.
 
 ## Environment Setup
 
@@ -39,16 +39,6 @@ $ cargo build-bpf
 $ solana config set --url devnet
 ```
 
-### Request airdrop for test
-
-``` shell
-$ solana airdrop 2
-```
-Note: if this is your first time running solana devnet, you will need a new solana devnet wallet address:
-``` shell
-$ solana-keygen new -o <directory>
-```
-
 ###  Deploy the program
 
 ``` shell 
@@ -63,15 +53,10 @@ $ ts-node client/main.ts
 ```
 Then, the result will be print, like following:
 ```shell
-Connection to cluster established: https://api.devnet.solana.com { 'feature-set': 1006352700, 'solana-core': '1.8.12' }
 Answer Information: 
-        CryptoPunk #1234 
-        source chain = Ethererum 
-        price is 66.914393 ETH 
-        updated on 'Fri, 21 Jan 2022 07:23:48 GMT'
-Answer Information: 
-        Degen Ape #6117 
-        source chain = Solana 
-        price is 15.319274 SOL 
-        updated on 'Fri, 21 Jan 2022 07:39:17 GMT'
+        degods 
+        floor price is 269 SOL 
+        AI floor price is 269 SOL 
+        avg price is 360 SOL 
+        updated on 'Fri, 22 Jul 2022 08:00:14 GMT'
 ```

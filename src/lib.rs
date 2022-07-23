@@ -9,15 +9,14 @@ use solana_program::{
 
 #[derive(BorshSerialize, BorshDeserialize)]
 pub struct Answer {
-    pub source_chain: u32,
-    pub price: u64,
-    pub time: u64,
-    pub decimal: u64,
-    pub program_addr: Pubkey,
-    pub token_addr: Pubkey,
-    pub local_addr: Pubkey, // It is solana local mint address of the nft which is transfer from other chain
-    pub name: String,
-    pub price_type: String,
+    pub code: String,
+    pub unit: String,
+    pub decimals: u64,
+    pub aggregate_time: u64,
+
+    pub floor_price: u64,
+    pub ai_floor_price: u64,
+    pub avg_price: u64,
 }
 
 entrypoint!(process_instruction);
@@ -28,21 +27,19 @@ fn process_instruction(
 ) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
-    let report_account = next_account_info(accounts_iter)?;
+    let feed_account = next_account_info(accounts_iter)?;
     let answer_account = next_account_info(accounts_iter)?;
 
-    let report_info = banksea_oracle::get_report_info(report_account)?;
+    let feed_info = banksea_oracle::get_feed_info(feed_account)?;
     let mut answer_info: Answer = try_from_slice_unchecked(&answer_account.data.borrow())?;
-    answer_info.source_chain = report_info.source_chain;
-    answer_info.program_addr = report_info.program_addr;
-    answer_info.token_addr = report_info.token_addr;
-    answer_info.local_addr = report_info.local_addr;
-    answer_info.price = report_info.price;
-    answer_info.decimal = report_info.decimal;
-    answer_info.time = report_info.time;
-    answer_info.name = report_info.name;
-    answer_info.price_type = report_info.price_type;
-    
+    answer_info.unit = feed_info.unit;
+    answer_info.code = feed_info.code;
+    answer_info.decimals = feed_info.decimals;
+    answer_info.floor_price = feed_info.floor_price;
+    answer_info.avg_price = feed_info.avg_price;
+    answer_info.ai_floor_price = feed_info.ai_floor_price;
+    answer_info.aggregate_time = feed_info.aggregate_time;
     answer_info.serialize(&mut &mut answer_account.data.borrow_mut()[..])?;
+    
     Ok(())
 }
