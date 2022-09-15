@@ -200,7 +200,7 @@ export async function checkProgram(): Promise<void> {
 
 // A example for getting oracle data
 export async function getOracleInfo(): Promise<void> {
-  const feedAccountId = new PublicKey("6n3X9PStr3EPKvYfqkaz3ezS3A3rxHdUY8kRyfsnurfU") // It is `degods` 
+  const feedAccountId = new PublicKey("DGaMbFh9BPZbNVWLygK4m3VhxBaNZkCumbnhpijFroaD") // It is `degods` 
 
   let feedAccount = {
     pubkey: feedAccountId,

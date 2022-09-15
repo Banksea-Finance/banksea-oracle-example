@@ -33,9 +33,9 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
 name = "banksea-oracle-client"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c757617e55c19fcf76f31a33336ecfe6066401e00ae94cefdc8405fbbf9ea193"
+checksum = "d86702f61f78d73ab4022c3c00daaabde6e8675e22a17974b9107703c283f7e0"
 dependencies = [
  "borsh",
  "borsh-derive",

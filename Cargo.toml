@@ -7,7 +7,6 @@ edition = "2018"
 borsh = "0.9.3"
 borsh-derive = "0.9.3"
 solana-program = "=1.10.29"
-banksea-oracle-client = "0.3.0"
-
+banksea-oracle-client = "0.4.0"
 [lib]
 crate-type = ["cdylib", "lib"]
